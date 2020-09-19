@@ -92,7 +92,7 @@ module Hopac (H : HopacModel) : HopacModel = struct
             A.send taker ();
             loop () )
           else (
-            Queue.push (giver, x);
+            Queue.push (giver, x) givers;
             loop () )
       | Take (taker, r) ->
           if Queue.length givers > 0 then (
@@ -102,16 +102,16 @@ module Hopac (H : HopacModel) : HopacModel = struct
             A.send taker ();
             loop () )
           else (
-            Queue.push (taker, r);
+            Queue.push (taker, r) takers;
             loop () )
     in
     C (A.start @@ loop ())
 
-  let give (x_ch : 'x ch) (x : 'x) =
+  let give x_ch x =
     let ( >>= ) = A.( >>= ) in
     J
       ( A.self >>= fun giver ->
-        A.send (un_c x_ch) (Give (giver, r));
+        A.send (un_c x_ch) (Give (giver, x));
         A.receive )
 
   let take x_ch =
